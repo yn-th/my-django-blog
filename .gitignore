@@ -1,33 +1,50 @@
-# Django #
-*.log
-*.pot
-*.pyc
-__pycache__/
-db.sqlite3
-media/
+# -------------------------------
+# Django / Python
+# -------------------------------
+*.log                  
+*.pot                
+*.pyc                 
+__pycache__/        
+db.sqlite3            
+media/                
+staticfiles/          
 
-# Backup files #
-*.bak
-
-# Environment #
-.env
-.venv
+# -------------------------------
+# فایل‌های محیط مجازی و وابستگی‌ها
+# -------------------------------
+.env                  
+.venv                  
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 
-# IDE #
-.vscode/
-.idea/
+# -------------------------------
+# Tailwind / Node (اگر از npm استفاده می‌کنید)
+# -------------------------------
+node_modules/          
+# اما فایل‌های زیر را نگه می‌داریم:
+# package.json
+# package-lock.json
+# tailwind.config.js
 
-# OS #
-.DS_Store
-Thumbs.db
+# -------------------------------
+# IDE و ابزارهای توسعه
+# -------------------------------
+.vscode/              
+.idea/                 
+*.swp              
+*.swo
 
-# Static files (if collected) #
-staticfiles/
+# -------------------------------
+# سیستم‌عامل
+# -------------------------------
+.DS_Store          
+Thumbs.db              
 
-# sensitive files #
-*.pem
+# -------------------------------
+# فایل‌های حساس امنیتی
+# -------------------------------
+*.pem                
+*.key                
