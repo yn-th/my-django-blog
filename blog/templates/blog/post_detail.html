@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <!-- محتوای اصلی -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-3xl">
+        <!-- برگشت به خانه -->
+        <a href="{% url 'blog:home' %}" class="text-indigo-600 hover:underline mb-6 inline-block">← بازگشت به لیست مقالات</a>
+        
+        <!-- عنوان پست -->
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{post.title}}  </h1>
+        
+        <!-- متادیتا -->
+        <div class="flex items-center text-gray-500 text-sm mb-8">
+            <span>نویسنده: {{post.author}} </span>
+            <span class="mx-2">|</span>
+            <span>{{post.created}}  </span>
+            <span class="mx-2">|</span>
+            <span>دسته‌بندی: برنامه‌نویسی</span>
+        </div>
+
+        <!-- تصویر شاخص (اختیاری) -->
+        <img src="https://placehold.co/800x400/4F46E5/FFFFFF?text=تصویر+شاخص" alt="تصویر پست" class="w-full h-auto rounded-xl mb-8 shadow-md">
+
+        <!-- متن محتوا -->
+        <div class="mt-5 text-[1.1rem] leading-loose break-words whitespace-pre-wrap overflow-x-auto max-w-full">
+            <p>{{post.body|linebreaks}}</p>
+        </div>
+        <br>
+        <hr>
+        <br>
+
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-3xl font-bold text-gray-900">{{ post.title }}</h1>
+    <div class="flex gap-2">
+        {% if user.is_authenticated and user == post.author %}
+            <a href="{% url 'blog:edit' post.pk %}" 
+               class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition text-sm font-medium">
+                ✏️ ویرایش
+            </a>
+            <a href="{% url 'blog:delete' post.pk %}" 
+               class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium">
+                🗑️ حذف
+            </a>
+        {% endif %}
+    </div>
+</div>
+        <!-- بخش اشتراک‌گذاری (اختیاری) -->
+        <div class="mt-12 pt-6 border-t flex items-center justify-between text-sm text-gray-500">
+            <span>این مطلب را به اشتراک بگذارید:</span>
+            <div class="flex space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-indigo-600">توییتر</a>
+                <a href="#" class="hover:text-indigo-600">تلگرام</a>
+                <a href="#" class="hover:text-indigo-600">لینکدین</a>
+            </div>
+        </div>
+    </main>
+
+
+{% endblock content %}
