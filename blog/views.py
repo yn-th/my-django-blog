@@ -56,3 +56,19 @@ def delete_post(request , pk):
         messages.success(request , "پست با موفقیت حذف شد")
         return redirect('blog:home')
     return render(request , 'blog/post_delete_confirm.html',{'post':post})
+
+@login_required
+def dashboard(request):
+    posts = Post.objects.filter(author= request.user).order_by('-updated')
+    total = posts.count
+    published = posts.filter(status = Post.Status.PUBLISH).count
+    drafts = posts.filter(status = Post.Status.DRAFT).count
+
+    context ={
+        'posts':posts,
+        'total':total,
+        'published' : published,
+        'drafts' : drafts
+    }
+
+    return render(request , 'blog/dashboard.html',context)

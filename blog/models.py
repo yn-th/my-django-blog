@@ -9,13 +9,13 @@ class Post (models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts',
+        related_name='author',
         )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     class Status(models.TextChoices):
-        DRAFT = 'DF','DRAFT'
-        PUBLISH = 'PB','PUBLISH'
+        DRAFT = 'DF','پیش نویس'
+        PUBLISH = 'PB','منتشر شده'
     
     status = models.CharField(
         max_length=2,

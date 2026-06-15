@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- بدنه اصلی: سایدبار + محتوا -->
+    <div class="flex flex-grow">
+        <!-- سایدبار (مخفی در موبایل) -->
+        <aside class="hidden lg:flex lg:flex-col w-64 bg-white border-l shadow-sm p-6 space-y-6">
+            <div class="text-center">
+                <!-- جایگزین برای تصویر پروفایل -->
+                <div class="w-20 h-20 bg-indigo-100 rounded-full mx-auto flex items-center justify-center text-2xl font-bold text-indigo-600">
+                    ی
+                </div>
+                
+                <p class="mt-2 font-medium text-gray-900">{{request.user}} </p>
+                <p class="text-sm text-gray-500">user@example.com</p>
+                
+            </div>
+            <nav class="space-y-2">
+                <a href="{% url 'blog:dashboard' %}" class="flex items-center px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-medium">
+                    📊 داشبورد
+                </a>
+                <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    📝 پست‌های من
+                </a>
+                <a href="{% url 'blog:create' %}" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    ✨ نوشتن پست جدید
+                </a>
+                <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    ⚙️ تنظیمات
+                </a>
+            </nav>
+        </aside>
+
+        <!-- محتوای اصلی -->
+        <main class="flex-1 p-6 overflow-x-auto">
+            <div class="max-w-6xl mx-auto">
+
+                <!-- سربرگ و دکمه پست جدید -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                    <h1 class="text-2xl font-bold text-gray-900">داشبورد کاربر</h1>
+                    <a href="{% url 'blog:create' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        ✏️ نوشتن پست جدید
+                    </a>
+                </div>
+
+                <!-- کارت‌های آمار -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- کل پست‌ها -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">📄</div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">کل پست‌ها</p>
+                            <p class="text-2xl font-bold text-gray-900">{{total}}</p>
+                        </div>
+                    </div>
+ 
+                    <div class="bg-white rounded-xl shadow-sm p-6 flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">✅</div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">منتشر شده</p>
+                            <p class="text-2xl font-bold text-green-600">{{published}}</p>
+                        </div>
+                    </div>
+                    <!-- پیش‌نویس‌ها -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 flex items-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-2xl">📝</div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">پیش‌نویس</p>
+                            <p class="text-2xl font-bold text-yellow-600">{{drafts}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- جدول پست‌ها -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b">
+                        <h2 class="text-lg font-semibold text-gray-900">پست‌های اخیر</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">عنوان</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">وضعیت</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاریخ</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <!-- نمونه ردیف - با حلقه تکرار می‌شود -->
+                                {% for post in posts  %}
+
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">  {{post.title}} </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                                {% if post.status == 'PB' %}
+                                                    bg-green-100 text-green-800
+                                                {% else %}
+                                                    bg-yellow-100 text-yellow-800
+                                                {% endif %}
+                                            ">
+                                                {{ post.get_status_display }}
+                                            </span>
+
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {{post.created}} </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <a href="{% url 'blog:edit' post.pk %}" class="text-indigo-600 hover:text-indigo-900 ml-3">ویرایش</a>
+                                        <a href="{% url 'blog:delete' post.pk %}" class="text-red-600 hover:text-red-900">حذف</a>
+                                    </td>
+                                </tr>
+                                {%empty%}
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">هنوز هیچ پستی ننوشته‌اید.</td>
+                                </tr>
+                                
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock content %}
