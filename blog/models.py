@@ -26,3 +26,29 @@ class Post (models.Model):
         return f"{self.title} - {self.author}"
     class Meta:
         ordering = ['-created']
+
+
+class Comment(models.Model):
+    
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_comments',
+        blank=True,
+        null=True
+        )
+    name = models.CharField( max_length=150, blank=True)
+    email = models.EmailField(max_length=254,blank=True)
+    body = models.TextField()
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+        )
+    created = models.DateTimeField( auto_now_add=True)
+    is_active = models.BooleanField(default=False)
+    class Meta:
+        ordering = ['-created']
+
+    def __str__(self):
+        return f"کامنت {self.author} روی {self.post.title[:30]}"

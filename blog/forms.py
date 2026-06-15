@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post , Comment
 
 class CreatePostForm(forms.ModelForm):
     
@@ -20,3 +20,10 @@ class CreatePostForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white'
             }),
         }
+
+class CommentForm(forms.ModelForm):
+    email = forms.EmailField(required=False)
+    name = forms.CharField( max_length=158, required=False)
+    class Meta:
+        model = Comment
+        fields = ('body',)

@@ -1,6 +1,6 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
-from .models import Post
-from .forms import CreatePostForm
+from .models import Post ,Comment
+from .forms import CreatePostForm , CommentForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,33 @@ def post_list(request):
 
 def post_detail(request , pk):
     post = get_object_or_404(Post , pk=pk)
-    return render(request,'blog/post_detail.html',{'post':post,'pk':pk})
+    comments = Comment.objects.filter(is_active = True)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if request.user.is_authenticated:
+            form.fields['name'].required=False
+            form.fields['email'].required=False
+        else:
+            form.fields['name'].required=True
+            form.fields['email'].required=True
+
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.post = post
+            if request.user.is_authenticated:
+                new_comment.author = request.user
+            else:
+                new_comment.name = form.cleaned_data['name']
+                new_comment.name = form.cleaned_data['email']
+
+            new_comment.save()
+            messages.success(request, "نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.")
+            return redirect('blog:detail',pk = post.pk)
+        
+    else:
+        form = CommentForm()
+
+    return render(request,'blog/post_detail.html',{'post':post,'pk':pk,'comments':comments,'form':form})
 
 @login_required
 def create_post(request):
@@ -72,3 +98,4 @@ def dashboard(request):
     }
 
     return render(request , 'blog/dashboard.html',context)
+

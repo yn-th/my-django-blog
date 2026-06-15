@@ -1,0 +1,9 @@
+{% for comment in comments %}
+    <div>
+        <strong>{{ comment.author }}</strong>
+        <span>{{ comment.created|date:"j F Y" }}</span>
+        <p>{{ comment.body }}</p>
+    </div>
+{% empty %}
+    <p>هنوز کامنتی ثبت نشده.</p>
+{% endfor %}
