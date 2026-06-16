@@ -16,7 +16,11 @@ class Post (models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','پیش نویس'
         PUBLISH = 'PB','منتشر شده'
-    
+    likes = models.ManyToManyField(
+        User,
+        related_name='liked_post',
+        blank=True,
+        )
     status = models.CharField(
         max_length=2,
         choices=Status.choices,

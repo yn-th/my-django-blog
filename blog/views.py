@@ -4,6 +4,7 @@ from .forms import CreatePostForm , CommentForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -54,6 +55,10 @@ def post_detail(request, pk):
         parent=None,
         post=post
     )
+    is_liked = False
+    if request.user.is_authenticated:
+        is_liked = post.likes.filter(pk=request.user.pk).exists()
+
     if request.method == 'POST':
         form = CommentForm(request.POST)
         # تنظیم اجباری بودن فیلدها بر اساس لاگین بودن کاربر
@@ -95,6 +100,7 @@ def post_detail(request, pk):
         'post': post,
         'comments': comments,
         'form': form,
+        'is_liked':is_liked,
     })
     
 @login_required
@@ -154,3 +160,25 @@ def dashboard(request):
 
     return render(request , 'blog/dashboard.html',context)
 
+
+@login_required
+def post_liked(request , pk):
+    post = get_object_or_404(Post,pk=pk)
+    user= request.user
+    if user in post.likes.all():
+        post.likes.remove(user)
+        liked = False
+    else:
+        post.likes.add(user)
+        liked = True
+        messages.success(request , 'شما این پست را پسندید')
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # درخواست AJAX → ارسال JSON
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': post.likes.count()
+        })
+    else:
+        # درخواست معمولی → ریدایرکت (fallback)
+        return redirect('blog:detail', pk=post.pk)

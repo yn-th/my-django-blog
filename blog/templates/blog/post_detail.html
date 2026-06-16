@@ -45,6 +45,20 @@
         </div>
     </div>
 
+<div class="flex items-center gap-2 mt-4">
+    {% if user.is_authenticated %}
+        <form id="like-form" method="POST" action="{% url 'blog:like_post' post.pk %}">
+            {% csrf_token %}
+            <button type="submit" id="like-button" class="text-2xl {% if is_liked %}text-red-600{% else %}text-gray-400 hover:text-red-600{% endif %}">
+                {% if is_liked %}❤️{% else %}🤍{% endif %}
+            </button>
+        </form>
+    {% else %}
+        <span class="text-2xl text-gray-400">🤍</span>
+    {% endif %}
+    <span id="likes-count">{{ post.likes.count }}</span> لایک
+</div>
+
     <!-- بخش اشتراک‌گذاری -->
     <div class="mt-12 pt-6 border-t flex items-center justify-between text-sm text-gray-500">
         <span>این مطلب را به اشتراک بگذارید:</span>
@@ -172,4 +186,55 @@
     </div>
 </main>
 
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.getElementById('like-form').addEventListener('submit', function(event) {
+        event.preventDefault();  // جلوگیری از submit معمولی
+
+        const form = event.target;
+        const url = form.action;
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // به‌روزرسانی تعداد لایک
+            document.getElementById('likes-count').textContent = data.likes_count;
+
+            // تغییر ظاهر دکمه
+            const button = document.getElementById('like-button');
+            if (data.liked) {
+                button.innerHTML = '❤️';
+                button.classList.remove('text-gray-400', 'hover:text-red-600');
+                button.classList.add('text-red-600');
+            } else {
+                button.innerHTML = '🤍';
+                button.classList.remove('text-red-600');
+                button.classList.add('text-gray-400', 'hover:text-red-600');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
 {% endblock content %}
