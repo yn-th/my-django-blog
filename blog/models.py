@@ -37,6 +37,13 @@ class Comment(models.Model):
         blank=True,
         null=True
         )
+    parent = models.ForeignKey(
+        'self',
+        related_name='replies',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+        )
     name = models.CharField( max_length=150, blank=True)
     email = models.EmailField(max_length=254,blank=True)
     body = models.TextField()
@@ -46,7 +53,7 @@ class Comment(models.Model):
         related_name='comments'
         )
     created = models.DateTimeField( auto_now_add=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     class Meta:
         ordering = ['-created']
 
