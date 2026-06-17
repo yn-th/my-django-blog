@@ -1,6 +1,6 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
-from .models import Post ,Comment
-from .forms import CreatePostForm , CommentForm
+from .models import Post ,Comment , Profile
+from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -182,3 +182,90 @@ def post_liked(request , pk):
     else:
         # درخواست معمولی → ریدایرکت (fallback)
         return redirect('blog:detail', pk=post.pk)
+
+# @login_required
+# def my_profile(request ):
+#     profile , create  = Profile.objects.get_or_create(user = request.user)
+#     if request.method== 'POST':
+#         if 'submit_user' in request.POST:
+
+#             form_user = UserUpdateForm(request.POST, instance=request.user)
+#             form_profile = ProfileForm(instance=profile)
+#             if form_user.is_valid():
+#                 form_user.save()
+#                 messages.success(request,'پروفایل بروز شده')
+#                 return redirect('blog:my_profile')
+#         elif 'submit_profile' in request.POST:
+
+#             form_user= UserUpdateForm(instance=request.user)
+#             form_profile = ProfileForm(request.POST,instance=profile)
+#             if form_profile.is_valid():
+#                 form_profile.save()
+#                 messages.success(request,'پروفایل بروز شدش')
+#                 return redirect('blog:my_profile')
+#         else:
+#             form_user = UserUpdateForm(instance=request.user)
+#             form_profile = ProfileForm(instance=profile)
+#     else:
+#         form_user = UserUpdateForm(instance=request.user)
+#         form_profile = ProfileForm(instance=profile)
+
+#     context = {
+#         'form_user': form_user,
+#         'form_profile': form_profile,
+#         'profile': profile,
+#     }      
+
+#     return render(request , 'blog/profile.html',context)
+
+
+@login_required
+def my_profile(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    # اگر درخواست AJAX برای ذخیره فرم باشد (POST با form_type)
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'user_info':
+            form = UserUpdateForm(request.POST, instance=request.user)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({
+                    'success': True,
+                    'message': 'اطلاعات حساب به‌روز شد.',
+                    'data': {
+                        'first_name': request.user.first_name,
+                        'last_name': request.user.last_name,
+                        'email': request.user.email,
+                    }
+                })
+            else:
+                return JsonResponse({'success': False, 'errors': form.errors})
+
+        elif form_type == 'profile_bio':
+            form = ProfileForm(request.POST, instance=profile)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({
+                    'success': True,
+                    'message': 'بیوگرافی به‌روز شد.',
+                    'data': {
+                        'bio': profile.bio,
+                    }
+                })
+            else:
+                return JsonResponse({'success': False, 'errors': form.errors})
+
+        return JsonResponse({'success': False, 'message': 'نوع فرم نامعتبر'})
+
+    # GET معمولی
+    form_user = UserUpdateForm(instance=request.user)
+    form_profile = ProfileForm(instance=profile)
+
+    context = {
+        'profile': profile,
+        'form_user': form_user,
+        'form_profile': form_profile,
+    }
+    return render(request, 'blog/profile.html', context)

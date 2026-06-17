@@ -63,3 +63,12 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"کامنت {self.author} روی {self.post.title[:30]}"
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+    

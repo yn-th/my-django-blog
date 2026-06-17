@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="flex-grow container mx-auto px-4 py-12 max-w-2xl">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">پروفایل من</h1>
+
+    <!-- نمایش پیام‌های عمومی (اختیاری) -->
+    <div id="global-message" class="hidden mb-4"></div>
+
+    <!-- بخش اطلاعات حساب -->
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">اطلاعات حساب</h2>
+
+        <!-- حالت نمایش -->
+        <div id="user-info-view">
+            <p><strong>نام:</strong> <span id="display-first-name">{{ user.first_name }}</span></p>
+            <p><strong>نام خانوادگی:</strong> <span id="display-last-name">{{ user.last_name }}</span></p>
+            <p><strong>ایمیل:</strong> <span id="display-email">{{ user.email }}</span></p>
+            <button onclick="editSection('user-info')" class="mt-2 text-sm text-indigo-600 hover:underline">✏️ ویرایش</button>
+        </div>
+
+        <!-- حالت ویرایش (مخفی) -->
+        <div id="user-info-edit" class="hidden mt-4">
+            <form id="user-info-form" onsubmit="submitForm(event, 'user_info')">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="user_info">
+                {{ form_user.as_p }}
+                <div id="user-info-errors" class="text-red-500 text-sm mt-2"></div>
+                <div class="flex gap-2 mt-3">
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">ذخیره</button>
+                    <button type="button" onclick="cancelEdit('user-info')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">لغو</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- بخش بیوگرافی -->
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">بیوگرافی</h2>
+
+        <!-- حالت نمایش -->
+        <div id="profile-bio-view">
+            <p id="display-bio">{{ profile.bio|default:"هنوز بیوگرافی ثبت نشده." }}</p>
+            <button onclick="editSection('profile-bio')" class="mt-2 text-sm text-indigo-600 hover:underline">✏️ ویرایش</button>
+        </div>
+
+        <!-- حالت ویرایش (مخفی) -->
+        <div id="profile-bio-edit" class="hidden mt-4">
+            <form id="profile-bio-form" onsubmit="submitForm(event, 'profile_bio')">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="profile_bio">
+                {{ form_profile.as_p }}
+                <div id="profile-bio-errors" class="text-red-500 text-sm mt-2"></div>
+                <div class="flex gap-2 mt-3">
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">ذخیره</button>
+                    <button type="button" onclick="cancelEdit('profile-bio')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">لغو</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    // تابع کمکی برای دریافت CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // فعال کردن حالت ویرایش یک بخش
+    function editSection(section) {
+        document.getElementById(section + '-view').classList.add('hidden');
+        document.getElementById(section + '-edit').classList.remove('hidden');
+        // پاک کردن خطاهای قبلی
+        document.getElementById(section + '-errors').innerHTML = '';
+    }
+
+    // لغو ویرایش
+    function cancelEdit(section) {
+        document.getElementById(section + '-view').classList.remove('hidden');
+        document.getElementById(section + '-edit').classList.add('hidden');
+    }
+
+    // ارسال فرم با AJAX
+    function submitForm(event, formType) {
+        event.preventDefault();
+        const form = event.target;
+        const url = "{% url 'blog:my_profile' %}";
+        const formData = new FormData(form);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // به‌روزرسانی داده‌های نمایشی
+                if (formType === 'user_info') {
+                    document.getElementById('display-first-name').textContent = data.data.first_name;
+                    document.getElementById('display-last-name').textContent = data.data.last_name;
+                    document.getElementById('display-email').textContent = data.data.email;
+                    cancelEdit('user-info');
+                } else if (formType === 'profile_bio') {
+                    document.getElementById('display-bio').textContent = data.data.bio || 'هنوز بیوگرافی ثبت نشده.';
+                    cancelEdit('profile-bio');
+                }
+                // نمایش پیام موفقیت موقت
+                showGlobalMessage(data.message, 'success');
+            } else {
+                // نمایش خطاها
+                const errors = data.errors;
+                let errorHtml = '';
+                for (const field in errors) {
+                    errorHtml += `<p>${field}: ${errors[field].join(', ')}</p>`;
+                }
+                document.getElementById(formType.replace('_', '-') + '-errors').innerHTML = errorHtml;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showGlobalMessage('خطا در ارتباط با سرور.', 'error');
+        });
+    }
+
+    function showGlobalMessage(message, type) {
+        const msgDiv = document.getElementById('global-message');
+        msgDiv.textContent = message;
+        msgDiv.className = 'mb-4 px-4 py-3 rounded-lg text-sm ' + 
+            (type === 'success' ? 'bg-green-50 text-green-800 border border-green-300' : 'bg-red-50 text-red-800 border border-red-300');
+        msgDiv.classList.remove('hidden');
+        setTimeout(() => { msgDiv.classList.add('hidden'); }, 3000);
+    }
+</script>
+
+{% endblock content %}
