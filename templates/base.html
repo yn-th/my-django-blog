@@ -42,6 +42,19 @@
                 <a href="{% url 'blog:my_profile'  %}" class="text-gray-700 hover:text-indigo-600 transition"> پروفایل</a>
                 <a href="blog/about.html" class="text-gray-700 hover:text-indigo-600 transition">درباره ما</a>
                 <a href="contact.html" class="text-gray-700 hover:text-indigo-600 transition">تماس با ما</a>
+            {% if user.is_authenticated %}
+    <!-- لینک‌های داشبورد، پروفایل، خروج -->
+                {% comment %} <form method="POST" action="{% url 'blog:logout' %}" class="inline">
+    {% csrf_token %}
+    <button type="submit" class="text-gray-700 hover:text-indigo-600 transition bg-transparent border-none cursor-pointer p-0 font-[inherit]">
+        خروج
+    </button>
+</form> {% endcomment %}
+            {% else %}
+    <!-- لینک‌های ورود، ثبت‌نام -->
+                <a href="{% url 'blog:login' %}">ورود</a>
+                <a href="{% url 'blog:signup' %}">ثبت‌نام</a>
+{% endif %}
             </div>
         </div>
     </nav>

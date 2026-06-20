@@ -1,21 +1,32 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
 from .models import Post ,Comment , Profile , Category
-from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm
+from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm ,CustomUserCreationForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
+
 # Create your views here.
 
+def signup(request):
+    if request.method =='POST':
+        form =CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"ثبت نام با موفقیت انجام شد ُاکنون میتوانید وارد شوید")
+            return redirect('blog:home')
+    else: 
+        form = CustomUserCreationForm()
+    return render(request,'blog/signup.html',{'form':form})
 
 def post_list(request):
     post_list = Post.objects.filter(status=Post.Status.PUBLISH).order_by('-created')
     query = request.GET.get('q')
     if query:
         search_filter = Q(title__icontains = query) |Q(body__icontains = query)|Q(author__username__icontains = query)
-        post_list = post_list.filter(search_filter) 
+        post_list = post_list.filter(search_filter)
 
     paginator = Paginator(post_list, 6)  # 6 پست در هر صفحه
     page_number = request.GET.get('page')
