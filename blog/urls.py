@@ -10,5 +10,6 @@ urlpatterns = [
     path('detail/<pk>',views.post_detail,name='detail'),
     path('edit/<pk>',views.update_post,name='edit'),
     path('delete/<pk>',views.delete_post,name='delete'),
-
+    
+    path('category/<slug:slug>/', views.category_posts, name='category_posts'),
 ]

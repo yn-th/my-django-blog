@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="flex-grow container mx-auto px-4 py-8">
+    <!-- عنوان و جستجو -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            پست‌های دسته‌بندی «{{ category.name }}»
+        </h1>
+        <form method="GET" class="max-w-xl mx-auto">
+            <div class="flex gap-2">
+                <input type="text" name="q" value="{{ query|default:'' }}" 
+                       placeholder="جستجو در این دسته..."
+                       class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
+                    جستجو
+                </button>
+                {% if query %}
+                    <a href="{% url 'blog:category_posts' slug=category.slug %}" 
+                       class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        پاک کردن
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+        {% if query %}
+            <p class="text-center text-gray-500 mt-4">{{ posts.paginator.count }} نتیجه یافت شد</p>
+        {% endif %}
+    </div>
+
+    <!-- لیست پست‌ها -->
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {% for post in posts %}
+        <article class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+            {% else %}
+                <div class="w-full h-48 bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-4xl">📝</div>
+            {% endif %}
+            <div class="p-6">
+                <div class="flex items-center text-sm text-gray-500 mb-2">
+                    <span>{{ post.created|date:"j F Y" }}</span>
+                    <span class="mx-2">•</span>
+                    <span>{{ post.author }}</span>
+                    {% if post.category %}
+                        <span class="mx-2">•</span>
+                        <a href="{% url 'blog:category_posts' slug=post.category.slug %}" class="text-indigo-600 hover:underline">{{ post.category.name }}</a>
+                    {% endif %}
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">
+                    <a href="{{ post.get_absolute_url }}" class="hover:text-indigo-600 transition">{{ post.title }}</a>
+                </h2>
+                <p class="text-gray-600 line-clamp-3">{{ post.body|truncatewords:30 }}</p>
+                <a href="{% url 'blog:detail' post.pk %}" class="inline-block mt-4 text-indigo-600 font-medium hover:underline">ادامه مطلب ←</a>
+            </div>
+        </article>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-xl text-gray-500">😕 هیچ پستی در این دسته یافت نشد.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- صفحه‌بندی -->
+    {% if posts.paginator.num_pages > 1 %}
+    <div class="flex justify-center mt-12">
+        <nav class="inline-flex items-center space-x-2 space-x-reverse">
+            {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" 
+                   class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">قبلی</a>
+            {% else %}
+                <span class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">قبلی</span>
+            {% endif %}
+
+            {% for num in posts.paginator.page_range %}
+                {% if num == posts.number %}
+                    <span class="px-3 py-2 bg-indigo-600 text-white rounded-lg">{{ num }}</span>
+                {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                    <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" 
+                       class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}{% if query %}&q={{ query }}{% endif %}" 
+                   class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">بعدی</a>
+            {% else %}
+                <span class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">بعدی</span>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</main>
+{% endblock content %}

@@ -1,16 +1,45 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
-from .models import Post ,Comment , Profile
+from .models import Post ,Comment , Profile , Category
 from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.core.paginator import Paginator
+from django.db.models import Q
 # Create your views here.
 
 
 def post_list(request):
-    posts = Post.objects.all()
-    return render (request ,'blog/index.html',{'posts':posts} )
+    post_list = Post.objects.filter(status=Post.Status.PUBLISH).order_by('-created')
+    query = request.GET.get('q')
+    if query:
+        search_filter = Q(title__icontains = query) |Q(body__icontains = query)|Q(author__username__icontains = query)
+        post_list = post_list.filter(search_filter) 
+
+    paginator = Paginator(post_list, 6)  # 6 پست در هر صفحه
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)  # اگر شماره نامعتبر بود، صفحهٔ اول را می‌دهد
+
+    return render(request, 'blog/index.html', {'posts': posts ,'query':query})
+
+def category_posts(request , slug):
+    category = get_object_or_404(Category,slug=slug)
+    posts = category.posts.filter(status=Post.Status.PUBLISH).order_by('-created')
+    query = request.GET.get('q')
+    if query:
+        search_filter = Q(title__icontains = query)|Q(body__icontains = query)
+        posts = posts.filter(search_filter)
+    paginator = Paginator(posts , 6)
+    page_number = request.GET.get('page')
+    posts_page = paginator.get_page(page_number)
+
+    context = {
+        'category':category,
+        'quert':query,
+        'posts':posts_page
+    }
+    return render(request , 'blog/category_posts.html',context)
 
 
 # def post_detail(request , pk):
@@ -78,7 +107,7 @@ def post_detail(request, pk):
             if parent_id:
                 # اطمینان از اینکه والد متعلق به همین پست است
                 parent_comment = get_object_or_404(Comment, id=parent_id, post=post)
-                new_comment.parent = parent_comment   # اصلاح: new_comment.parent
+                new_comment.parent = parent_comment  
 
             # تنظیم نام و ایمیل
             if request.user.is_authenticated:

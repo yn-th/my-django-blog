@@ -46,6 +46,16 @@
         </div>
     </nav>
 
+    <div class="container mx-auto px-4 py-2">
+    <div class="flex flex-wrap gap-2">
+        {% for cat in categories %}
+            <a href="{% url 'blog:category_posts' slug=cat.slug %}" 
+               class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-indigo-100 hover:text-indigo-600 transition">
+                {{ cat.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
 
     <main class="flex-grow container mx-auto px-4 py-8">
         {% block content %}
@@ -53,14 +63,44 @@
         {% endblock content %}
     </main>
 
-        <!-- صفحه‌بندی (بعداً داینامیک می‌شود) -->
-        <div class="flex justify-center mt-12 space-x-2 space-x-reverse">
-            <a href="#" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">قبلی</a>
-            <a href="#" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">۱</a>
-            <a href="#" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">۲</a>
-            <a href="#" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">بعدی</a>
-        </div>
-    </main>
+        {% if posts.paginator.num_pages > 1 %}
+<div class="flex justify-center mt-12">
+    <nav class="inline-flex items-center space-x-2 space-x-reverse" aria-label="Page navigation">
+        {% if posts.has_previous %}
+            <a href="?page={{ posts.previous_page_number }}" 
+               class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                قبلی
+            </a>
+        {% else %}
+            <span class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">
+                قبلی
+            </span>
+        {% endif %}
+
+        {% for num in posts.paginator.page_range %}
+            {% if num == posts.number %}
+                <span class="px-3 py-2 bg-indigo-600 text-white rounded-lg">{{ num }}</span>
+            {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                <a href="?page={{ num }}" 
+                   class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}" 
+               class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                بعدی
+            </a>
+        {% else %}
+            <span class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">
+                بعدی
+            </span>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
 
     <!-- فوتر -->
     <footer class="bg-white border-t mt-auto">

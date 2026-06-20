@@ -15,7 +15,14 @@
         <span class="mx-2">|</span>
         <span>{{ post.created }}</span>
         <span class="mx-2">|</span>
-        <span>دسته‌بندی: برنامه‌نویسی</span>
+        <span class="mx-2">|</span>
+        <span>دسته‌بندی: 
+            {% if post.category %}
+                <a href="{% url 'blog:category_posts' slug=post.category.slug %}" class="text-indigo-600 hover:underline">{{ post.category.name }}</a>
+            {% else %}
+              بدون دسته
+            {% endif %}
+        </span>
     </div>
 
     <!-- تصویر شاخص -->
