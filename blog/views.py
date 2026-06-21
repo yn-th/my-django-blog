@@ -14,7 +14,7 @@ def signup(request):
     if request.method =='POST':
         form =CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form= form.save(commit=False)
+            form.save()
             
             messages.success(request,"ثبت نام با موفقیت انجام شد ُاکنون میتوانید وارد شوید")
             return redirect('blog:home')
@@ -147,6 +147,7 @@ def post_detail(request, pk):
 @login_required
 def create_post(request):
     # form = CreatePostForm()
+    # category = Category.objects.all()
     if request.method == 'POST':
         form = CreatePostForm(request.POST)
         if form.is_valid():

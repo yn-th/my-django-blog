@@ -31,6 +31,16 @@
                     <input type="password" name="{{ field.name }}" id="{{ field.id_for_label }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                            placeholder="{% if field.name == 'password1' %}رمز عبور{% else %}تکرار رمز عبور{% endif %}">
+                {% elif   field.name == 'first_name' %}
+                    <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                           value="{{ field.value|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                           placeholder="نام ">
+                {% elif   field.name == 'last_name' %}
+                    <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                           value="{{ field.value|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                           placeholder="نام خانوادگی ">
                 {% else %}
                     {{ field }}
                 {% endif %}
