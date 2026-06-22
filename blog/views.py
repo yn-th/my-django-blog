@@ -1,5 +1,5 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
-from .models import Post ,Comment , Profile , Category
+from .models import Post ,Comment , Profile , Category , Tag
 from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm ,CustomUserCreationForm
 from django.http import HttpResponse
 from django.contrib import messages
@@ -152,10 +152,12 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            form.save_m2m()
             return redirect ('blog:home')
     else :
         form = CreatePostForm()
     return render (request ,'blog/create_post.html',{'form':form ,'is_edit':False} )
+
 @login_required
 def update_post(request , pk):
     post = get_object_or_404(Post,pk=pk)
@@ -310,6 +312,27 @@ def my_profile(request):
     }
     return render(request, 'blog/profile.html', context)
 
+def tag_posts(request , slug):
+    tag = get_object_or_404(Tag , slug = slug) 
+    posts = tag.posts.filter(status = Post.Status.PUBLISH).order_by('-created')
+
+    query = request.GET.get('q')
+    if query:
+        search_filter = Q(title__icontains = query)|Q(body__icontains = query)
+        posts = posts.filter(search_filter)
+
+    paginator= Paginator(posts , 6)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number) 
+
+    context = {
+        'tag':tag,
+        'posts':posts,
+        'query':query,
+
+    }
+    print(context)
+    return render(request,'blog/tag_posts.html',context)
 
 def about_us(request):
     return render(request,'blog/about.html')

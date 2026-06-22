@@ -3,6 +3,22 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 # Create your models here.
 
+class Tag(models.Model):
+    name = models.CharField( max_length=250)
+    slug = models.SlugField(allow_unicode=True)
+
+    def save(self,*args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name , allow_unicode=True)
+        super(Tag,self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name'] 
+
+
 class Category(models.Model):
     name = models.CharField( max_length=250)
     slug = models.SlugField(allow_unicode=True)
@@ -14,7 +30,7 @@ class Category(models.Model):
     def save(self ,*args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name,allow_unicode=True)
-            super(Category, self).save(*args, **kwargs)
+        super(Category, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
 
@@ -23,6 +39,8 @@ class Category(models.Model):
 class Post (models.Model):
     title = models.CharField(max_length=250)
     body = models.TextField()
+
+    tags = models.ManyToManyField(Tag, related_name='posts',blank=True)
     category = models.ForeignKey(
         Category,
         related_name="posts",

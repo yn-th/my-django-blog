@@ -32,7 +32,18 @@
     <div class="mt-5 text-[1.1rem] leading-loose break-words whitespace-pre-wrap overflow-x-auto max-w-full">
         {{ post.body|linebreaks }}
     </div>
-    
+    <!-- تگ‌های پست -->
+{% if post.tags.all %}
+<div class="mt-6 flex flex-wrap items-center gap-2">
+    <span class="text-sm text-gray-500">برچسب‌ها:</span>
+    {% for tag in post.tags.all %}
+        <a href="{% url 'blog:tag_posts' slug=tag.slug %}" 
+           class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-indigo-100 hover:text-indigo-600 transition">
+            #{{ tag.name }}
+        </a>
+    {% endfor %}
+</div>
+{% endif %}
     <br><hr><br>
 
     <!-- دکمه‌های ویرایش و حذف (فقط برای نویسنده) -->

@@ -20,7 +20,7 @@ class CreatePostForm(forms.ModelForm):
     
     class Meta:
         model = Post
-        fields = ("title",'body','status','category')
+        fields = ("title",'body','status','category','tags')
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition',
@@ -37,6 +37,10 @@ class CreatePostForm(forms.ModelForm):
             }),
             'category': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white'
+            }),
+            'tags': forms.SelectMultiple(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white',
+                'size': '5'  # ارتفاع لیست (اختیاری)
             }),
         }
 
