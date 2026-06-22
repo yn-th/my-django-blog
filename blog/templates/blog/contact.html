@@ -1,27 +1,5 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تماس با ما | وبلاگ من</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Vazir', 'Tahoma', sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
-
-    <!-- نوار ناوبری -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="index.html" class="text-2xl font-bold text-indigo-600">وبلاگ من</a>
-            <div class="space-x-6 space-x-reverse">
-                <a href="index.html" class="text-gray-700 hover:text-indigo-600 transition">خانه</a>
-                <a href="about.html" class="text-gray-700 hover:text-indigo-600 transition">درباره ما</a>
-                <a href="contact.html" class="text-gray-700 hover:text-indigo-600 transition">تماس با ما</a>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block content %}
 
     <!-- محتوای اصلی -->
     <main class="flex-grow container mx-auto px-4 py-12 max-w-2xl">
@@ -60,20 +38,5 @@
                 </button>
             </form>
         </div>
-        
-        <!-- اطلاعات تماس جایگزین -->
-        <div class="mt-8 text-center text-gray-500">
-            <p>یا از طریق ایمیل زیر با من در ارتباط باشید:</p>
-            <a href="mailto:example@email.com" class="text-indigo-600 hover:underline">example@email.com</a>
-        </div>
     </main>
-
-    <!-- فوتر -->
-    <footer class="bg-white border-t mt-auto">
-        <div class="container mx-auto px-4 py-6 text-center text-gray-500 text-sm">
-            © ۱۴۰۳ وبلاگ من. تمامی حقوق محفوظ است.
-        </div>
-    </footer>
-
-</body>
-</html>
+{% endblock content %}

@@ -102,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -125,6 +125,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'blog:login'
 LOGOUT_REDIRECT_URL = 'blog:home'
 LOGIN_REDIRECT_URL = 'blog:home'

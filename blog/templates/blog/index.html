@@ -55,13 +55,13 @@
                 </div>
                 <div class="p-6">
                     {% if post.category %}
-                            <span class="mx-2">•</span>
+                            <span class="mx-2">دسته بندی:</span>
                             <a href="{% url 'blog:category_posts' slug=post.category.slug %}" class="text-indigo-600 hover:underline">{{ post.category.name }}</a>
                     {% endif %}
                     <div class="flex items-center text-sm text-gray-500 mb-2">
                         <span> {{post.created}} </span>
                         <span class="mx-2">•</span>
-                        <span>{{post.author}}:نام نویسنده</span>
+                        <span>نام نویسنده: {{post.author}}</span>
                     </div>
                     <h2 class="text-xl font-semibold text-gray-900 mb-3">
                         <a href="{% url 'blog:detail' post.pk %}" class="hover:text-indigo-600 transition">عنوان پست :{{post.title}}</a>

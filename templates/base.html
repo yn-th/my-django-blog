@@ -12,6 +12,34 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- نوار ناوبری -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold text-indigo-600">وبلاگ من</a>
+            <div class="space-x-6 space-x-reverse">
+                <a href="{% url 'blog:home' %}" class="text-gray-700 hover:text-indigo-600 transition">خانه</a>
+                <a href="{% url 'blog:dashboard' %}" class="text-gray-700 hover:text-indigo-600 transition"> داشبورد</a>
+                <a href="{% url 'blog:create' %}" class="text-gray-700 hover:text-indigo-600 transition">افزدون پست</a>
+                <a href="{% url 'blog:my_profile'  %}" class="text-gray-700 hover:text-indigo-600 transition"> پروفایل</a>
+                <a href="{% url 'blog:about' %}" class="text-gray-700 hover:text-indigo-600 transition">درباره ما</a>
+                <a href="{% url 'blog:contact' %}" class="text-gray-700 hover:text-indigo-600 transition">تماس با ما</a>
+            {% if user.is_authenticated %}
+    <!-- لینک‌های داشبورد، پروفایل، خروج -->
+         <form method="POST" action="{% url 'blog:logout' %}" class="inline">
+    {% csrf_token %}
+    <button type="submit" class="text-gray-700 hover:text-indigo-600 transition bg-transparent border-none cursor-pointer p-0 font-[inherit]">
+        خروج
+    </button>
+</form> 
+            {% else %}
+    <!-- لینک‌های ورود، ثبت‌نام -->
+                <a href="{% url 'blog:login' %}">ورود</a>
+                <a href="{% url 'blog:signup' %}">ثبت‌نام</a>
+{% endif %}
+            </div>
+        </div>
+    </nav>
 {% if messages %}
     <div class="container mx-auto px-4 mt-4 space-y-2">
         {% for message in messages %}
@@ -31,34 +59,6 @@
         {% endfor %}
     </div>
 {% endif %}
-    <!-- نوار ناوبری -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="index.html" class="text-2xl font-bold text-indigo-600">وبلاگ من</a>
-            <div class="space-x-6 space-x-reverse">
-                <a href="index.html" class="text-gray-700 hover:text-indigo-600 transition">خانه</a>
-                <a href="{% url 'blog:dashboard' %}" class="text-gray-700 hover:text-indigo-600 transition"> داشبورد</a>
-                <a href="{% url 'blog:create' %}" class="text-gray-700 hover:text-indigo-600 transition">افزدون پست</a>
-                <a href="{% url 'blog:my_profile'  %}" class="text-gray-700 hover:text-indigo-600 transition"> پروفایل</a>
-                <a href="blog/about.html" class="text-gray-700 hover:text-indigo-600 transition">درباره ما</a>
-                <a href="contact.html" class="text-gray-700 hover:text-indigo-600 transition">تماس با ما</a>
-            {% if user.is_authenticated %}
-    <!-- لینک‌های داشبورد، پروفایل، خروج -->
-                {% comment %} <form method="POST" action="{% url 'blog:logout' %}" class="inline">
-    {% csrf_token %}
-    <button type="submit" class="text-gray-700 hover:text-indigo-600 transition bg-transparent border-none cursor-pointer p-0 font-[inherit]">
-        خروج
-    </button>
-</form> {% endcomment %}
-            {% else %}
-    <!-- لینک‌های ورود، ثبت‌نام -->
-                <a href="{% url 'blog:login' %}">ورود</a>
-                <a href="{% url 'blog:signup' %}">ثبت‌نام</a>
-{% endif %}
-            </div>
-        </div>
-    </nav>
-
     <div class="container mx-auto px-4 py-2">
     <div class="flex flex-wrap gap-2">
         {% for cat in categories %}

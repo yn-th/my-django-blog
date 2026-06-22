@@ -146,8 +146,6 @@ def post_detail(request, pk):
     
 @login_required
 def create_post(request):
-    # form = CreatePostForm()
-    # category = Category.objects.all()
     if request.method == 'POST':
         form = CreatePostForm(request.POST)
         if form.is_valid():
@@ -311,3 +309,10 @@ def my_profile(request):
         'form_profile': form_profile,
     }
     return render(request, 'blog/profile.html', context)
+
+
+def about_us(request):
+    return render(request,'blog/about.html')
+
+def contact(request):
+    return render(request,'blog/contact.html')
