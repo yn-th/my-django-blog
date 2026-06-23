@@ -39,7 +39,7 @@ class Category(models.Model):
 class Post (models.Model):
     title = models.CharField(max_length=250)
     body = models.TextField()
-
+    image = models.ImageField(upload_to='posts/%Y/%m', blank=True)
     tags = models.ManyToManyField(Tag, related_name='posts',blank=True)
     category = models.ForeignKey(
         Category,
@@ -111,6 +111,7 @@ class Comment(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
+    image = models.ImageField( upload_to='profile/%Y/%m', blank=True)
 
     def __str__(self):
         return f"Profile of {self.user.username}"

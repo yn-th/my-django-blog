@@ -20,7 +20,7 @@ class CreatePostForm(forms.ModelForm):
     
     class Meta:
         model = Post
-        fields = ("title",'body','status','category','tags')
+        fields = ("title",'body','status','category','tags','image')
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition',
@@ -42,8 +42,10 @@ class CreatePostForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white',
                 'size': '5'  # ارتفاع لیست (اختیاری)
             }),
-        }
-
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+        })
+}
 class CommentForm(forms.ModelForm):
     email = forms.EmailField(required=False)
     name = forms.CharField( max_length=158, required=False)
@@ -54,10 +56,21 @@ class CommentForm(forms.ModelForm):
 from django.contrib.auth.models import User
 
 class ProfileForm(forms.ModelForm):
+
     class Meta:
         model = Profile
-        fields = ['bio',]
+        fields = ['bio']
 
+class ImageProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = ['image']
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+            }),
+        }
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User

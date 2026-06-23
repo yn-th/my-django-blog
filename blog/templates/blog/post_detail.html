@@ -26,7 +26,11 @@
     </div>
 
     <!-- تصویر شاخص -->
-    <img src="https://placehold.co/800x400/4F46E5/FFFFFF?text=تصویر+شاخص" alt="تصویر پست" class="w-full h-auto rounded-xl mb-8 shadow-md">
+{% if post.image %}
+    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-auto rounded-xl mb-8 shadow-md">
+{% else %}
+    <div class="w-full h-48 bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-4xl rounded-xl mb-8">📝</div>
+{% endif %}
 
     <!-- متن محتوا -->
     <div class="mt-5 text-[1.1rem] leading-loose break-words whitespace-pre-wrap overflow-x-auto max-w-full">

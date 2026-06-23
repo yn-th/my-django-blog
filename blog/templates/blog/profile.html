@@ -2,6 +2,18 @@
 {% block content %}
 
 <main class="flex-grow container mx-auto px-4 py-12 max-w-2xl">
+    {% if profile.image %}
+<div class="flex justify-center">
+    <img src="{{ profile.image.url }}" alt="آواتار" 
+         class="w-24 h-24 rounded-full object-cover shadow-md ">
+</div>
+{% else %}
+    <!-- نمایش حرف اول نام کاربر به‌عنوان آواتار پیش‌فرض -->
+    <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-3xl font-bold text-indigo-600 shadow-md">
+        {{ user.username|slice:":1" }}
+    </div>
+{% endif %}
+<br>
     <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">پروفایل من</h1>
 
     <!-- نمایش پیام‌های عمومی (اختیاری) -->
@@ -30,6 +42,7 @@
 
         <!-- حالت ویرایش (مخفی) -->
         <div id="user-info-edit" class="hidden mt-4">
+
             <form id="user-info-form" onsubmit="submitForm(event, 'user_info')">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="user_info">
@@ -67,6 +80,46 @@
             </form>
         </div>
     </div>
+
+    <!-- بخش آواتار -->
+<!-- بخش تصویر پروفایل -->
+<div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">تصویر پروفایل</h2>
+
+    <!-- حالت نمایش -->
+    <div id="avatar-view">
+        <div class="flex justify-center mb-4">
+            {% if profile.image %}
+                <img id="avatar-img" src="{{ profile.image.url }}" alt="آواتار"
+                     class="w-24 h-24 rounded-full object-cover shadow-md">
+            {% else %}
+                <div id="avatar-placeholder" class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-3xl font-bold text-indigo-600 shadow-md">
+                    {{ user.username|slice:":1" }}
+                </div>
+                <img id="avatar-img" src="" alt="آواتار" class="hidden w-24 h-24 rounded-full object-cover shadow-md">
+            {% endif %}
+        </div>
+        <div class="text-center">
+            <button onclick="editSection('avatar')" class="text-sm text-indigo-600 hover:underline">✏️ ویرایش</button>
+        </div>
+    </div>
+
+    <!-- حالت ویرایش (مخفی) -->
+    <div id="avatar-edit" class="hidden mt-4">
+        <form id="avatar-form" onsubmit="submitAvatarForm(event)" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="image">
+            <div class="space-y-3">
+                {{ form_image.as_p }}
+            </div>
+            <div id="avatar-errors" class="text-red-500 text-sm mt-2"></div>
+            <div class="flex justify-center gap-2 mt-3">
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">ذخیره</button>
+                <button type="button" onclick="cancelEdit('avatar')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">لغو</button>
+            </div>
+        </form>
+    </div>
+</div>
 </main>
 
 <script>
@@ -154,6 +207,59 @@
         msgDiv.classList.remove('hidden');
         setTimeout(() => { msgDiv.classList.add('hidden'); }, 3000);
     }
+  
+function submitAvatarForm(event) {
+    event.preventDefault();
+    const form = event.target;
+    const url = "{% url 'blog:my_profile' %}";
+    const formData = new FormData(form);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+            // Content-Type به‌طور خودکار توسط مرورگر تنظیم می‌شود
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // به‌روزرسانی تصویر در بخش آواتار
+            const avatarImg = document.getElementById('avatar-img');
+            const placeholder = document.getElementById('avatar-placeholder');
+            // افزودن timestamp برای جلوگیری از کش
+            const newUrl = data.image_url + '?t=' + new Date().getTime();
+
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+            avatarImg.src = newUrl;
+            avatarImg.classList.remove('hidden');
+
+            // اگر تصویر بالای صفحه هم داری، آن را هم به‌روز کن (اختیاری)
+            const topImg = document.getElementById('top-avatar-img');
+            if (topImg) {
+                topImg.src = newUrl;
+            }
+
+            cancelEdit('avatar');
+            showGlobalMessage(data.message, 'success');
+        } else {
+            const errors = data.errors;
+            let errorHtml = '';
+            for (const field in errors) {
+                errorHtml += `<p>${field}: ${errors[field].join(', ')}</p>`;
+            }
+            document.getElementById('avatar-errors').innerHTML = errorHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showGlobalMessage('خطا در ارتباط با سرور.', 'error');
+    });
+}
 </script>
 
 {% endblock content %}

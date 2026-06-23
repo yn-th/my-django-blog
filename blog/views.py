@@ -1,6 +1,6 @@
 from django.shortcuts import render , get_object_or_404 ,redirect
 from .models import Post ,Comment , Profile , Category , Tag
-from .forms import CreatePostForm , CommentForm , UserUpdateForm , ProfileForm ,CustomUserCreationForm
+from .forms import CreatePostForm , CommentForm ,ImageProfileForm, UserUpdateForm , ProfileForm ,CustomUserCreationForm
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -147,7 +147,7 @@ def post_detail(request, pk):
 @login_required
 def create_post(request):
     if request.method == 'POST':
-        form = CreatePostForm(request.POST)
+        form = CreatePostForm(request.POST,request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -165,7 +165,7 @@ def update_post(request , pk):
         messages.error(request , "شما نمی توانید این پست را تغییر دهید")
         return redirect('home')
     if request.method == 'POST':
-        form = CreatePostForm(request.POST , instance=post)
+        form = CreatePostForm(request.POST ,request.FILES ,instance=post)
         if form.is_valid():
             form.save()
             messages.success(request , "پست با موفقیت تغییر یافت")
@@ -296,6 +296,20 @@ def my_profile(request):
                         'bio': profile.bio,
                     }
                 })
+        elif form_type == 'image':
+            form = ImageProfileForm(request.POST,request.FILES ,instance=profile)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({
+                'success':True,
+                'messages':"عکس پروفایل بروز شد",
+                'data':
+                {
+                    'image_url':profile.image.url
+                }
+            })
+
+
             else:
                 return JsonResponse({'success': False, 'errors': form.errors})
 
@@ -304,11 +318,14 @@ def my_profile(request):
     # GET معمولی
     form_user = UserUpdateForm(instance=request.user)
     form_profile = ProfileForm(instance=profile)
+    form_image =ImageProfileForm(instance=profile)
+    
 
     context = {
         'profile': profile,
         'form_user': form_user,
         'form_profile': form_profile,
+        'form_image':form_image,
     }
     return render(request, 'blog/profile.html', context)
 
@@ -331,7 +348,7 @@ def tag_posts(request , slug):
         'query':query,
 
     }
-    print(context)
+    
     return render(request,'blog/tag_posts.html',context)
 
 def about_us(request):
