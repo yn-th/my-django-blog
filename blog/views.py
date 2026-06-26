@@ -54,41 +54,6 @@ def category_posts(request , slug):
     return render(request , 'blog/category_posts.html',context)
 
 
-# def post_detail(request , pk):
-#     post = get_object_or_404(Post , pk=pk)
-#     comments = Comment.objects.filter(is_active = True , parent = None)
-#     if request.method == 'POST':
-#         form = CommentForm(request.POST)
-#         if request.user.is_authenticated:
-#             form.fields['name'].required=False
-#             form.fields['email'].required=False
-#         else:
-#             form.fields['name'].required=True
-#             form.fields['email'].required=True
-
-#         if form.is_valid():
-#             new_comment = form.save(commit=False)
-#             new_comment.post = post
-#             parent_id = request.POST.get('parent_id')
-#             if parent_id:
-#                 parent_comment = get_object_or_404(Comment,id = parent_id , post=post)
-#                 new_comment.parent =parent_comment
-        
-#             if request.user.is_authenticated:
-#                 new_comment.author = request.user
-#             else:
-#                 new_comment.name = form.cleaned_data['name']
-#                 new_comment.name = form.cleaned_data['email']
-
-#             new_comment.save()
-#             messages.success(request, "نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.")
-#             return redirect('blog:detail',pk = post.pk)
-        
-#     else:
-#         form = CommentForm()
-
-#     return render(request,'blog/post_detail.html',{'post':post,'comments':comments,'form':form})
-
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = Comment.objects.filter(
