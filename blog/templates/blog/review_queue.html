@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">صف بازبینی</h1>
+
+    <!-- پیام‌ها -->
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+        {% for message in messages %}
+            <div class="px-4 py-3 rounded-lg text-sm 
+                {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-300
+                {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-300
+                {% else %}bg-blue-50 text-blue-800 border border-blue-300{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if posts %}
+    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">عنوان</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">نویسنده</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاریخ ایجاد</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">عملیات</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for post in posts %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                            <a href="{{ post.get_absolute_url }}" class="hover:text-indigo-600 transition">
+                                {{ post.title }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ post.author }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ post.created|date:"j F Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <div class="flex gap-2">
+                                <form method="POST" action="{% url 'blog:approve_post' post.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition text-xs font-medium">
+                                        تأیید
+                                    </button>
+                                </form>
+                                <form method="POST" action="{% url 'blog:reject_post' post.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-xs font-medium">
+                                        برگشت
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-xl text-gray-500">✅ هیچ پستی در انتظار بررسی نیست.</p>
+    </div>
+    {% endif %}
+</main>
+
+{% endblock content %}

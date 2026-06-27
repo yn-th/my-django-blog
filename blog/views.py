@@ -184,17 +184,27 @@ def reject_post(request, pk):
 
 
 @login_required
+@group_required('Authors', 'Editors')
 def dashboard(request):
     posts = Post.objects.filter(author= request.user).order_by('-updated')
-    total = posts.count
-    published = posts.filter(status = Post.Status.PUBLISH).count
-    drafts = posts.filter(status = Post.Status.DRAFT).count
-    review_count = Post.objects.filter(status=Post.Status.REVIEW).count()
+    total = posts.count()
+    published = posts.filter(status = Post.Status.PUBLISH).count()
+    drafts = posts.filter(status = Post.Status.DRAFT).count()
+    reviews = posts.filter(status=Post.Status.REVIEW).count()
+    review_queue_count = 0
+    if request.user.groups.filter(name='Editors').exists():
+        review_queue_count = Post.objects.filter(status=Post.Status.REVIEW).count()
+
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
     context ={
         'posts':posts,
         'total':total,
         'published' : published,
-        'drafts' : drafts
+        'drafts' : drafts,
+        'reviews':reviews,
+        'review_queue_count':review_queue_count,
     }
 
     return render(request , 'blog/dashboard.html',context)
