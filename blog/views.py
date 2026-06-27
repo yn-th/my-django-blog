@@ -167,7 +167,7 @@ def delete_post(request , pk):
 @login_required
 @group_required('Editors')
 def review_queue(request):
-    posts = Post.objects.filter(status = Post.Status.REVIEW).order_by('-crated')
+    posts = Post.objects.filter(status = Post.Status.REVIEW).order_by('-created')
     return render (request , 'blog/review_queue.html',{'posts':posts})
 
 

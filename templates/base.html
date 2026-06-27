@@ -46,6 +46,10 @@
             </div>
             {% endif %}
             
+               {% if is_editor %}
+        <a href="{% url 'blog:review_queue' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">صف بازبینی</a>
+    {% endif %}
+
             <a href="{% url 'blog:my_profile' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">پروفایل</a>
             <a href="{% url 'blog:about' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">درباره ما</a>
             <a href="{% url 'blog:contact' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">تماس با ما</a>

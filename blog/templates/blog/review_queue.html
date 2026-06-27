@@ -34,7 +34,7 @@
                     {% for post in posts %}
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                            <a href="{{ post.get_absolute_url }}" class="hover:text-indigo-600 transition">
+                            <a href={% url 'blog:detail' post.pk %} class="hover:text-indigo-600 transition">
                                 {{ post.title }}
                             </a>
                         </td>
