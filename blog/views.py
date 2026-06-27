@@ -117,10 +117,17 @@ def create_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            if request.user.groups.filter(name = 'Authors').exists() and request.user.groups.filter(name = 'Editors').exists():
+            # if request.user.groups.filter(name = 'Authors').exists() and request.user.groups.filter(name = 'Editors').exists():
+            #     post.status = Post.Status.REVIEW
+            # else:
+            #     post.status = Post.Status.PUBLISH
+            if request.user.is_superuser or request.user.groups.filter(name='Editors').exists():
+                pass  # وضعیت از فرم آمده، دست‌نخورده می‌ماند 
+
+# اگر کاربر فقط Author باشد (و Editor نباشد)، وضعیت را به‌اجبار REVIEW می‌کنیم
+            elif request.user.groups.filter(name='Authors').exists():
                 post.status = Post.Status.REVIEW
-            else:
-                post.status = Post.Status.PUBLISH
+                messages.info(request, "پست شما برای بررسی به ویراستار ارسال شد.")
             post.save()
             form.save_m2m()
             return redirect ('blog:home')
@@ -187,6 +194,9 @@ def reject_post(request, pk):
 @group_required('Authors', 'Editors')
 def dashboard(request):
     posts = Post.objects.filter(author= request.user).order_by('-updated')
+    user = request.user
+    is_editor = user.groups.filter(name='Editors').exists() or user.is_superuser
+    is_author = user.groups.filter(name='Authors').exists() or is_editor 
     total = posts.count()
     published = posts.filter(status = Post.Status.PUBLISH).count()
     drafts = posts.filter(status = Post.Status.DRAFT).count()
@@ -205,6 +215,8 @@ def dashboard(request):
         'drafts' : drafts,
         'reviews':reviews,
         'review_queue_count':review_queue_count,
+        'is_editor':is_editor,
+        'is_author':is_author,
     }
 
     return render(request , 'blog/dashboard.html',context)
