@@ -70,7 +70,9 @@
                         </div>
                     </div>
                 </div>
-
+{% if user.groups.filter(name='Editors').exists %}
+    <a href="{% url 'blog:review_queue' %}" class="...">صف بازبینی ({{ review_count }})</a>
+{% endif %}
                 <!-- جدول پست‌ها -->
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                     <div class="px-6 py-4 border-b">

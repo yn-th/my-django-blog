@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
-
+from .decorators import  group_required
 # Create your views here.
 
 def signup(request):
@@ -110,12 +110,17 @@ def post_detail(request, pk):
     })
     
 @login_required
+@group_required('Authors','Editors')
 def create_post(request):
     if request.method == 'POST':
         form = CreatePostForm(request.POST,request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+            if request.user.groups.filter(name = 'Authors').exists() and request.user.groups.filter(name = 'Editors').exists():
+                post.status = Post.Status.REVIEW
+            else:
+                post.status = Post.Status.PUBLISH
             post.save()
             form.save_m2m()
             return redirect ('blog:home')
@@ -126,7 +131,8 @@ def create_post(request):
 @login_required
 def update_post(request , pk):
     post = get_object_or_404(Post,pk=pk)
-    if request.user !=post.author:
+    if request.user !=post.author and not request.user.groups.filter(name = 'Editors').exsits() and not request.user.is_superuser:
+
         messages.error(request , "شما نمی توانید این پست را تغییر دهید")
         return redirect('home')
     if request.method == 'POST':
@@ -142,7 +148,7 @@ def update_post(request , pk):
 @login_required
 def delete_post(request , pk):
     post = get_object_or_404(Post,pk=pk)
-    if request.user != post.author:
+    if request.user != post.author and not request.user.groups.filter(name='Editors').exists() and not request.user.is_superuser:
         messages.error(request , "شما مجاز به حذف این پست نیستید")
         return redirect('blog:home')
     if request.method == 'POST':
@@ -152,12 +158,38 @@ def delete_post(request , pk):
     return render(request , 'blog/post_delete_confirm.html',{'post':post})
 
 @login_required
+@group_required('Editors')
+def review_queue(request):
+    posts = Post.objects.filter(status = Post.Status.REVIEW).order_by('-crated')
+    return render (request , 'blog/review_queue.html',{'posts':posts})
+
+
+@login_required
+@group_required('Editors')
+def approve_post(request, pk):
+    post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
+    post.status = Post.Status.PUBLISH
+    post.save()
+    messages.success(request, "پست تأیید و منتشر شد.")
+    return redirect('blog:review_queue')
+
+@login_required
+@group_required('Editors')
+def reject_post(request, pk):
+    post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
+    post.status = Post.Status.DRAFT
+    post.save()
+    messages.success(request, "پست به پیش‌نویس برگشت داده شد.")
+    return redirect('blog:review_queue')
+
+
+@login_required
 def dashboard(request):
     posts = Post.objects.filter(author= request.user).order_by('-updated')
     total = posts.count
     published = posts.filter(status = Post.Status.PUBLISH).count
     drafts = posts.filter(status = Post.Status.DRAFT).count
-
+    review_count = Post.objects.filter(status=Post.Status.REVIEW).count()
     context ={
         'posts':posts,
         'total':total,

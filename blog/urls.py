@@ -36,6 +36,9 @@ urlpatterns = [
     path('edit/<pk>',views.update_post,name='edit'),
     path('delete/<pk>',views.delete_post,name='delete'),
     path('tags/<slug>',views.tag_posts,name='tag_posts'),
+    path('review-queue/', views.review_queue, name='review_queue'),
+    path('approve/<int:pk>/', views.approve_post, name='approve_post'),
+    path('reject/<int:pk>/', views.reject_post, name='reject_post'),
     
     path('category/<slug:slug>/', views.category_posts, name='category_posts'),
 ]

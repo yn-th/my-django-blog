@@ -59,6 +59,8 @@ class Post (models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','پیش نویس'
         PUBLISH = 'PB','منتشر شده'
+        REVIEW = 'RV','در انتظار بررسی'
+
     likes = models.ManyToManyField(
         User,
         related_name='liked_post',
@@ -67,7 +69,6 @@ class Post (models.Model):
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
-        default= Status.DRAFT,
         )
     def __str__(self):
         return f"{self.title} - {self.author}"
