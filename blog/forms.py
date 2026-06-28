@@ -2,6 +2,8 @@ from django import forms
 from .models import Post , Comment , Profile , Category
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django_quill.forms import QuillFormField
+from django_quill.widgets import QuillWidget 
 
 class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField( max_length=250, required=False,label='نام')
@@ -17,21 +19,19 @@ class CustomUserCreationForm(UserCreationForm):
     #     self.fields['password2'].help_text = None
 
 class CreatePostForm(forms.ModelForm):
-    
+
+    # body = forms.CharField(widget=QuillWidget())
+    body = forms.CharField(widget=QuillWidget(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Post
-        fields = ("title",'body','status','category','tags','image')
+        fields = ("title",'status','category','tags','image')
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition',
                 'placeholder': 'عنوان پست'
             }),
-            'body': forms.Textarea(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition',
-                'rows': 8,
-                'placeholder': 'متن پست را اینجا بنویسید...'
-            }),
-      
+          
             'status': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white'
             }),

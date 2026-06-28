@@ -1,3 +1,5 @@
+
+
 {% extends "base.html" %}
 {% block content %}
     <!-- پیام‌ها -->
@@ -14,14 +16,13 @@
     </div>
     {% endif %}
 
-    <!-- محتوای اصلی -->
     <main class="flex-grow container mx-auto px-4 py-12 max-w-2xl">
         <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">
             {% if is_edit %}ویرایش پست{% else %}نوشتن پست جدید{% endif %}
         </h1>
-         <form method="POST" enctype="multipart/form-data"> 
+        
         <div class="bg-white rounded-2xl shadow-md p-8">
-            <form method="post" class="space-y-6">
+            <form method="post" class="space-y-6" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}
@@ -55,6 +56,6 @@
             </form>
         </div>
     </main>
-
-
 {% endblock content %}
+
+{% block extra_js %}{{ form.media }}{% endblock extra_js %}
