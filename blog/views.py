@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .decorators import  group_required
 from django.urls import  reverse
+from django.contrib.auth.models import User
 # Create your views here.
 
 def signup(request):
@@ -131,6 +132,18 @@ def create_post(request):
                 messages.info(request, "پست شما برای بررسی به ویراستار ارسال شد.")
             post.save()
             form.save_m2m()
+            # ارسال اعلان به ویرایشگران
+            if post.status == Post.Status.REVIEW:
+                editors = User.objects.filter(
+                    Q(groups__name='Editors') |Q(is_superuser=True)
+            ).distinct()
+    
+                for editor in editors:
+                    Notification.objects.create(
+                        user=editor,
+                        message=f"پست جدیدی برای بررسی: «{post.title}»",
+                        link=reverse('blog:review_queue')  # یا می‌توانی لینک مستقیم به پست بدهی
+        )
             return redirect ('blog:home')
     else :
         form = CreatePostForm()
