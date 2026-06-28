@@ -41,6 +41,7 @@ urlpatterns = [
     path('reject/<int:pk>/', views.reject_post, name='reject_post'),
     
     path('category/<slug:slug>/', views.category_posts, name='category_posts'),
+    path('notifications/', views.notification_list, name='notification_list'),
 ]
 
 

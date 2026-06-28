@@ -1,5 +1,5 @@
-from django.shortcuts import render , get_object_or_404 ,redirect
-from .models import Post ,Comment , Profile , Category , Tag
+from django.shortcuts import render , get_object_or_404 ,redirect 
+from .models import Post ,Comment , Profile , Category , Tag , Notification
 from .forms import CreatePostForm , CommentForm ,ImageProfileForm, UserUpdateForm , ProfileForm ,CustomUserCreationForm
 from django.http import HttpResponse
 from django.contrib import messages
@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .decorators import  group_required
+from django.urls import  reverse
 # Create your views here.
 
 def signup(request):
@@ -176,8 +177,14 @@ def review_queue(request):
 def approve_post(request, pk):
     post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
     post.status = Post.Status.PUBLISH
+    Notification.objects.create(
+        user = post.author,
+        message = f"پست {post.title}تایید و منتشر شد",
+        link=reverse('blog:detail', args=[post.pk])
+
+    )
     post.save()
-    messages.success(request, "پست تأیید و منتشر شد.")
+    messages.success(request, "پست تأیید و به نویسنده اعلان فرستاده شد.")
     return redirect('blog:review_queue')
 
 @login_required
@@ -185,10 +192,32 @@ def approve_post(request, pk):
 def reject_post(request, pk):
     post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
     post.status = Post.Status.DRAFT
+    Notification.objects.create(
+        user = post.author,
+        message = f"پشت شما نیاز به ویرایش دارد{post.title}",
+        link=reverse('blog:detail', args=[post.pk])
+    )
     post.save()
     messages.success(request, "پست به پیش‌نویس برگشت داده شد.")
     return redirect('blog:review_queue')
 
+@login_required
+def notification_list(request):
+    notifications = request.user.notification.all()
+
+    # علامت‌گذاری همه به‌عنوان خوانده‌شده (با POST)
+    if request.method == 'POST' and 'mark_all_read' in request.POST:
+        notifications.filter(is_read=False).update(is_read=True)
+        messages.success(request, "همهٔ اعلان‌ها خوانده شدند.")
+        return redirect('blog:notification_list')
+
+    paginator = Paginator(notifications, 20)
+    page_number = request.GET.get('page')
+    notifications_page = paginator.get_page(page_number)
+
+    return render(request, 'blog/notification_list.html', {
+        'notifications': notifications_page
+    })
 
 @login_required
 @group_required('Authors', 'Editors')

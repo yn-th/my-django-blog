@@ -117,3 +117,19 @@ class Profile(models.Model):
     def __str__(self):
         return f"Profile of {self.user.username}"
     
+
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='notification',
+        on_delete=models.CASCADE
+        )
+    message = models.CharField( max_length=450)
+    is_read = models.BooleanField(default=False)
+    link = models.CharField( max_length=150 , blank=True)
+    created = models.DateTimeField( auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:50]}"
+    class Meta:
+        ordering = ('-created',)

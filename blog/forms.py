@@ -19,10 +19,6 @@ class CustomUserCreationForm(UserCreationForm):
     #     self.fields['password2'].help_text = None
 
 class CreatePostForm(forms.ModelForm):
-
-    # body = forms.CharField(widget=QuillWidget())
-    body = forms.CharField(widget=QuillWidget(attrs={'class': 'form-control'}))
-
     class Meta:
         model = Post
         fields = ("title",'status','category','tags','image')
@@ -31,7 +27,10 @@ class CreatePostForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition',
                 'placeholder': 'عنوان پست'
             }),
-          
+            'body': forms.Textarea(attrs={
+                'id': 'quill-textarea',  # یک ID ثابت برای دسترسی JavaScript
+                'class': 'hidden',       # با Tailwind مخفی می‌شود
+            }),
             'status': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white'
             }),

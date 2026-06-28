@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="flex-grow container mx-auto px-4 py-8 max-w-2xl">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">اعلان‌ها</h1>
+        {% if unread_notifications_count > 0 %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="mark_all_read" class="text-sm text-indigo-600 hover:underline">
+                علامت‌گذاری همه به‌عنوان خوانده‌شده
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="space-y-3">
+        {% for notification in notifications %}
+            <a href="{{ notification.link|default:'#' }}" 
+               class="block p-4 rounded-lg {% if not notification.is_read %}bg-blue-50 border border-blue-200{% else %}bg-white border{% endif %} hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <p class="text-gray-800">{{ notification.message }}</p>
+                    <span class="text-xs text-gray-500 mr-4">{{ notification.created|timesince }} پیش</span>
+                </div>
+            </a>
+        {% empty %}
+            <p class="text-gray-500 text-center py-8">هیچ اعلانی وجود ندارد.</p>
+        {% endfor %}
+    </div>
+
+    <!-- صفحه‌بندی -->
+    {% if notifications.paginator.num_pages > 1 %}
+    <div class="flex justify-center mt-6">
+        <!-- مشابه صفحه‌بندی‌های قبلی -->
+    </div>
+    {% endif %}
+</main>
+
+{% endblock content %}
