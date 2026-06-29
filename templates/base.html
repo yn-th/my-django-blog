@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>خانه | وبلاگ من</title>
+    <script>
+    tailwind.config = {
+        darkMode: 'class',   // حالت تاریک بر اساس کلاس 'dark' روی <html>
+    }
+    </script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,14 +16,18 @@
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex flex-col min-h-screen">
 
 <!-- نوار ناوبری -->
-<nav class="bg-white shadow-sm sticky top-0 z-50">
+<nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <!-- لوگو -->
         <a href="{% url 'blog:home' %}" class="text-2xl font-bold text-indigo-600 shrink-0">وبلاگ من</a>
-        
+
+<button id="theme-toggle" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition text-xl" title="تغییر تم">
+    🌙
+</button>
+
         <!-- لینک‌ها (بدون overflow-x) -->
         <div class="flex items-center space-x-6 space-x-reverse text-base">
             <a href="{% url 'blog:home' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">خانه</a>
@@ -50,7 +59,7 @@
         <a href="{% url 'blog:review_queue' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">صف بازبینی</a>
     {% endif %}
 
-            <a href="{% url 'blog:my_profile' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">پروفایل</a>
+            <a href="{% url 'blog:my_profile' %}" class=class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">پروفایل</a>
             <a href="{% url 'blog:about' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">درباره ما</a>
             <a href="{% url 'blog:contact' %}" class="text-gray-700 hover:text-indigo-600 transition whitespace-nowrap">تماس با ما</a>
             <a href="{% url 'blog:notification_list' %}" class="relative text-gray-700 hover:text-indigo-600 transition">
@@ -122,10 +131,32 @@
 {% endif %}
 
     <!-- فوتر -->
-    <footer class="bg-white border-t mt-auto">
-        <div class="container mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-auto">
+        <div class="container mx-auto px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
             © ۱۴۰۳ وبلاگ من. تمامی حقوق محفوظ است.
         </div>
     </footer>
+    <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+
+    // اعمال تم ذخیره‌شده
+    if (localStorage.getItem('theme') === 'dark') {
+        html.classList.add('dark');
+        themeToggle.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            themeToggle.textContent = '🌙';
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            themeToggle.textContent = '☀️';
+        }
+    });
+</script>
 </body>
 </html>

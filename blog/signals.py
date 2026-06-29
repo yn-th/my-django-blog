@@ -3,7 +3,13 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.urls import reverse
-from .models import Post, Notification
+from .models import Post, Notification , Profile
+
+@receiver(post_save , sender=User)
+def create_profile(sender , instance , created , **kwargs):
+    if created:
+        Profile.objects.create(user = instance)
+
 
 # ۱. ذخیره وضعیت قبلی هنگام بارگذاری نمونه
 @receiver(post_init, sender=Post)
