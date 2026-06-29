@@ -133,18 +133,6 @@ def create_post(request):
             post.save()
             form.save_m2m()
             # ارسال اعلان به ویرایشگران
-            if post.status == Post.Status.REVIEW:
-                editors = User.objects.filter(
-                    Q(groups__name='Editors') |Q(is_superuser=True)
-            ).distinct()
-    
-                for editor in editors:
-                    Notification.objects.create(
-                        user=editor,
-                        message=f"پست جدیدی برای بررسی: «{post.title}»",
-                        link=reverse('blog:review_queue')  # یا می‌توانی لینک مستقیم به پست بدهی
-        )
-            return redirect ('blog:home')
     else :
         form = CreatePostForm()
     return render (request ,'blog/create_post.html',{'form':form ,'is_edit':False} )
@@ -190,14 +178,9 @@ def review_queue(request):
 def approve_post(request, pk):
     post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
     post.status = Post.Status.PUBLISH
-    Notification.objects.create(
-        user = post.author,
-        message = f"پست {post.title}تایید و منتشر شد",
-        link=reverse('blog:detail', args=[post.pk])
-
-    )
     post.save()
-    messages.success(request, "پست تأیید و به نویسنده اعلان فرستاده شد.")
+
+
     return redirect('blog:review_queue')
 
 @login_required
@@ -205,13 +188,8 @@ def approve_post(request, pk):
 def reject_post(request, pk):
     post = get_object_or_404(Post, pk=pk, status=Post.Status.REVIEW)
     post.status = Post.Status.DRAFT
-    Notification.objects.create(
-        user = post.author,
-        message = f"پشت شما نیاز به ویرایش دارد{post.title}",
-        link=reverse('blog:detail', args=[post.pk])
-    )
     post.save()
-    messages.success(request, "پست به پیش‌نویس برگشت داده شد.")
+
     return redirect('blog:review_queue')
 
 @login_required
