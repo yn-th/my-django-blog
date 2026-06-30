@@ -132,6 +132,7 @@ def create_post(request):
                 messages.info(request, "پست شما برای بررسی به ویراستار ارسال شد.")
             post.save()
             form.save_m2m()
+            return redirect ('blog:home')
             # ارسال اعلان به ویرایشگران
     else :
         form = CreatePostForm()

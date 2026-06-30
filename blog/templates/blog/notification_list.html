@@ -19,7 +19,7 @@
             <a href="{{ notification.link|default:'#' }}" 
                class="block p-4 rounded-lg {% if not notification.is_read %}bg-blue-50 border border-blue-200{% else %}bg-white border{% endif %} hover:shadow-md transition">
                 <div class="flex justify-between items-start">
-                    <p class="text-gray-800">{{ notification.message }}</p>
+                    <p class="text-gray-600">{{ notification.message }}</p>
                     <span class="text-xs text-gray-500 mr-4">{{ notification.created|timesince }} پیش</span>
                 </div>
             </a>
